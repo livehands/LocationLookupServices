@@ -5,7 +5,7 @@ namespace LocationLookup.Models
 {
     public interface ILocationApi
     {
-        Task<IEnumerable<Location>> GetItems(WayPoint userLocation, int numItems = 3);
+        Task<IEnumerable<Destination>> GetItems(WayPoint userLocation, int numItems = 3);
 
         Task<string> GetMapImageUrl(WayPoint p1, WayPoint p2);
 

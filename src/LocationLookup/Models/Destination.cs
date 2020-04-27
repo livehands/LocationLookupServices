@@ -2,30 +2,21 @@
 
 namespace LocationLookup.Models
 {
-    public class Location
+    public class Destination
     {
         [JsonProperty("name")]
         public string Name { get; set; }
-
-        [JsonProperty("url")]
-        public string Url { get; set; }
-
-        [JsonProperty("point")]
-        public Point Point { get; set; }
-
+        [JsonProperty("location")]
+        public Point Location { get; set; }
         [JsonProperty("address")]
         public string Address { get; set; }
-
-        [JsonProperty("telephone")]
-        public string Telephone { get; set; }
-
         [JsonProperty("mapUri")]
         public string MapUri { get; set; }
-
+        [JsonProperty("phoneNumber")]
+        public string PhoneNumber { get; set; }
+        [JsonProperty("website")]
+        public string Website { get; set; }
         [JsonProperty("distance")]
         public string Distance { get; set; }
-
-        [JsonProperty("distanceNumber")]
-        public double DistanceNumber { get; set; }
     }
 }

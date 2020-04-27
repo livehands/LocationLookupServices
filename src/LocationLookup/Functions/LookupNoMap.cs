@@ -1,39 +1,36 @@
-using LocationLookup.Helpers;
-using LocationLookup.Models;
-using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
+using Newtonsoft.Json;
+using LocationLookup.Helpers;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using LocationLookup.Models;
 
 namespace LocationLookup.Functions
 {
-    public static class LocationLookup
+    public static class LookupNoMap
     {
-        [FunctionName("LocationLookup")]
-        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "near/{latitude}/{longitude}/{distance:int=16000}")] HttpRequest req,
+        [FunctionName("LookupNoMap")]
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "near-nomap/{latitude}/{longitude}/{distance:int=16000}")] HttpRequest req,
             [CosmosDB(Constants.CosmosDbName,
                       Constants.MyLocationsCollection,
                       CreateIfNotExists = true,
                       ConnectionStringSetting = "AzureCosmosDBConnectionString",
             SqlQuery ="SELECT * FROM locations l WHERE ST_DISTANCE(l.location, {{ 'type': 'Point', 'coordinates':[ {latitude},{longitude}]}}) < {distance}"
             )] IEnumerable<dynamic> destinations,
-            double latitude,
-            double longitude,
             ILogger log)
         {
             log.LogInformation("Location Lookup Started");
-
-            List<dynamic> resultList = new List<dynamic>();
+            int returnCount;
 
             try
             {
-                int returnCount;
-
                 string countParam = req.Query["count"];
                 if (!string.IsNullOrWhiteSpace(countParam) && countParam.CompareTo("all") == 0)
                 {
@@ -49,31 +46,6 @@ namespace LocationLookup.Functions
                     }
                 }
 
-                WayPoint userLocation = new WayPoint
-                {
-                    Longitude = longitude,
-                    Latitude = latitude
-                };
-
-                BingHelper bh = new BingHelper();
-
-                foreach (dynamic d in destinations.Take(returnCount))
-                {
-                    var location = d["location"]["coordinates"];
-                    if (location != null)
-                    {
-                        WayPoint wp = new WayPoint
-                        {
-                            Latitude = location[0],
-                            Longitude = location[1]
-                        };
-
-                        d.MapUri = await bh.GetMapImageUrl(userLocation, wp);
-                        d.Distance = await bh.GetRouteDistance(userLocation, wp);
-
-                        resultList.Add(d);
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -81,7 +53,7 @@ namespace LocationLookup.Functions
             }
 
             log.LogInformation("Location Lookup Complete");
-            return new OkObjectResult(resultList);
+            return new OkObjectResult(destinations.Take(returnCount));
         }
     }
 }

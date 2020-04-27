@@ -27,7 +27,7 @@ namespace LocationLookup.Functions
             string BingMapsAPIKey = Environment.GetEnvironmentVariable("BingMapKey");
 
             string baseAddress = $"{req.Scheme}://{req.Host.Value}";
-            string locationLookupUrl = baseAddress + "/api/custom/{0}/{1}";
+            string locationLookupUrl = baseAddress + "/api/near/{0}/{1}";
 
             // Get the Lat/Long for the Zip Code from Bing
             string reverseLookupTemplate = $"http://dev.virtualearth.net/REST/v1/Locations/US/{HttpUtility.UrlEncode(zipCode)}?key={BingMapsAPIKey}";

@@ -1,9 +1,10 @@
 ﻿using LocationLookup.Models;
+using LocationLookup.Models.BingModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LocationLookup.Helpers
@@ -18,9 +19,9 @@ namespace LocationLookup.Helpers
             client = new HttpClient();
         }
 
-        public async Task<IEnumerable<Location>> GetItems(WayPoint userLocation, int numItems = 3)
+        public async Task<IEnumerable<Destination>> GetItems(WayPoint userLocation, int numItems = 3)
         {
-            List<Location> locations = new List<Location>();
+            List<Destination> locations = new List<Destination>();
 
             // Each Entity Type should be separated by comma ',' 
             // Type Ids are here: https://docs.microsoft.com/en-us/bingmaps/rest-services/common-parameters-and-types/type-identifiers/
@@ -36,17 +37,17 @@ namespace LocationLookup.Helpers
                 ResourceSet bingLocationSet = bingresults.ResourceSets.FirstOrDefault();
                 List<Resource> bingLocations = bingLocationSet.Resources.Take(numItems).ToList();
 
-                Location l;
+                Destination l;
                 // Get the Map for the top 3 items
                 foreach (Resource r in bingLocations)
                 {
-                    l = new Location
+                    l = new Destination
                     {
                         Name = r.Name,
-                        Telephone = r.PhoneNumber,
+                        PhoneNumber = r.PhoneNumber,
                         Address = r.Address.FormattedAddress,
-                        Point = r.Point,
-                        Url = r.WebSite
+                        Location = r.Point,
+                        Website = r.WebSite
                     };
 
                     locations.Add(l);
